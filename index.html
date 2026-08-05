@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURA — Yönlü Ses Teknolojisi</title>
+<meta name="description" content="AURA, ultrasonik parametrik ses teknolojisiyle sesi yalnızca hedeflenen kişiye iletir. Mert Emir Gültekin tarafından geliştirildi.">
+<meta property="og:title" content="AURA — Yönlü Ses Teknolojisi">
+<meta property="og:description" content="40kHz ultrasonik dizi. Ses yalnızca hedeflenen kişiye ulaşır.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black:   #000000;
+  --g1:      #0d0d0d;
+  --g2:      #161616;
+  --g3:      #242424;
+  --g4:      #3a3a3a;
+  --g5:      #666666;
+  --g6:      #999999;
+  --g7:      #c4c4c4;
+  --g8:      #e8e8e8;
+  --white:   #ffffff;
+  --line:    #1e1e1e;
+  --line2:   #2a2a2a;
+  --mono:    'DM Mono', monospace;
+  --sans:    'Inter', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 999;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--line);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--white);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  user-select: none;
+}
+.logo-lambda {
+  font-size: 26px;
+  font-weight: 100;
+  font-style: italic;
+  letter-spacing: -2px;
+  color: var(--g6);
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+nav a {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--g5);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color .2s;
+}
+nav a:hover { color: var(--white); }
+
+.header-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--g5);
+  border: 1px solid var(--g3);
+  padding: 5px 14px;
+  text-transform: uppercase;
+}
+
+/* ─── HERO ─── */
+#hero {
+  min-height: 100vh;
+  padding-top: 56px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-lambda {
+  position: absolute;
+  right: -40px;
+  bottom: -60px;
+  font-size: clamp(280px, 40vw, 520px);
+  font-weight: 900;
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line);
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+  user-select: none;
+  letter-spacing: -20px;
+}
+
+.hero-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 48px 60px;
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  color: var(--g5);
+  text-transform: uppercase;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--g4);
+}
+
+h1 {
+  font-size: clamp(60px, 10vw, 148px);
+  font-weight: 800;
+  letter-spacing: -5px;
+  line-height: 0.9;
+  margin-bottom: 36px;
+}
+h1 .light {
+  font-weight: 100;
+  color: var(--g5);
+  letter-spacing: -3px;
+}
+
+.hero-desc {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--g6);
+  line-height: 1.8;
+  max-width: 440px;
+  margin-bottom: 52px;
+}
+.hero-desc strong {
+  color: var(--g8);
+  font-weight: 400;
+}
+
+.hero-cta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.btn {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  padding: 13px 32px;
+  text-decoration: none;
+  transition: opacity .2s, color .2s;
+}
+.btn-white {
+  background: var(--white);
+  color: var(--black);
+}
+.btn-white:hover { opacity: .85; }
+.btn-text {
+  color: var(--g5);
+  padding: 0;
+}
+.btn-text:hover { color: var(--white); }
+
+/* Hero bottom bar */
+.hero-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 48px;
+  border-top: 1px solid var(--line);
+  position: relative;
+  z-index: 1;
+}
+.hero-stats {
+  display: flex;
+  gap: 56px;
+}
+.stat {}
+.stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-num sub {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--g5);
+  vertical-align: baseline;
+}
+.stat-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--g5);
+  text-transform: uppercase;
+}
+.scroll-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--g5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.scroll-hint-line {
+  width: 36px; height: 1px;
+  background: var(--g4);
+  animation: lineSlide 2s ease-in-out infinite;
+}
+@keyframes lineSlide {
+  0%, 100% { transform: scaleX(1); transform-origin: left; }
+  50%       { transform: scaleX(0.4); transform-origin: left; }
+}
+
+/* ─── DIVIDER ─── */
+.hr { border: none; border-top: 1px solid var(--line); }
+
+/* ─── ILLUSTRATION ─── */
+#illustration {
+  background: var(--g1);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 80px 48px;
+  display: flex;
+  justify-content: center;
+}
+#illustration svg {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  overflow: visible;
+}
+
+/* ─── PRODUCT DETAIL ─── */
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--line);
+}
+.product-col {
+  padding: 72px 56px;
+}
+.product-col:first-child {
+  border-right: 1px solid var(--line);
+}
+.col-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--g4);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.col-headline {
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 600;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+.col-body {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--g5);
+  line-height: 1.85;
+  max-width: 420px;
+}
+.col-body + .col-body { margin-top: 14px; }
+
+/* Spec rows */
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-key {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--g5);
+}
+.spec-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--white);
+}
+
+/* ─── HOW IT WORKS ─── */
+#how {
+  padding: 100px 48px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: var(--g4);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-size: clamp(36px, 5vw, 66px);
+  font-weight: 700;
+  letter-spacing: -2.5px;
+  line-height: 1.05;
+  margin-bottom: 56px;
+}
+.section-title em {
+  font-style: normal;
+  font-weight: 100;
+  color: var(--g5);
+}
+.how-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-bottom: 100px;
+}
+.how-card {
+  background: var(--black);
+  padding: 48px 36px;
+  transition: background .3s;
+}
+.how-card:hover { background: var(--g1); }
+.card-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--g3);
+  margin-bottom: 32px;
+}
+.card-icon {
+  width: 38px; height: 38px;
+  stroke: var(--g4);
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-bottom: 28px;
+  display: block;
+  transition: stroke .3s;
+}
+.how-card:hover .card-icon { stroke: var(--g6); }
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.4px;
+  margin-bottom: 12px;
+}
+.card-body {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--g5);
+  line-height: 1.8;
+}
+
+/* ─── VISION ─── */
+#vision {
+  border-top: 1px solid var(--line);
+  padding: 100px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.vision-lead {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--g6);
+  line-height: 1.8;
+  max-width: 560px;
+  margin-bottom: 64px;
+}
+.vision-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.vision-card {
+  background: var(--black);
+  padding: 40px 36px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  transition: background .3s;
+}
+.vision-card:hover { background: var(--g1); }
+.vision-icon {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  stroke: var(--g4);
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-top: 2px;
+  transition: stroke .3s;
+}
+.vision-card:hover .vision-icon { stroke: var(--g6); }
+.vision-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.3px;
+  margin-bottom: 8px;
+}
+.vision-body {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--g5);
+  line-height: 1.75;
+}
+
+/* ─── CREATOR ─── */
+#creator {
+  border-top: 1px solid var(--line);
+  padding: 100px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.creator-name {
+  font-size: clamp(32px, 5vw, 72px);
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: .95;
+  margin-bottom: 20px;
+}
+.creator-role {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--g5);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.creator-bio {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--g5);
+  line-height: 1.85;
+  max-width: 380px;
+}
+.creator-data { }
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.data-row:first-child { border-top: 1px solid var(--line); }
+.data-key {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--g5);
+}
+.data-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--white);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--g4);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.footer-logo .logo-lambda { font-size: 22px; }
+.footer-meta {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: var(--g4);
+  text-align: right;
+  line-height: 1.9;
+}
+
+/* ─── SCROLL REVEAL ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .75s ease, transform .75s ease;
+}
+.reveal.show { opacity: 1; transform: none; }
+.d1 { transition-delay: .08s; }
+.d2 { transition-delay: .16s; }
+.d3 { transition-delay: .24s; }
+.d4 { transition-delay: .32s; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 960px) {
+  header { padding: 0 24px; }
+  nav { display: none; }
+  .hero-body { padding: 60px 24px 40px; }
+  .hero-foot { padding: 16px 24px; }
+  .hero-stats { gap: 28px; }
+  #illustration { padding: 48px 24px; }
+  .product-grid { grid-template-columns: 1fr; }
+  .product-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+  .product-col { padding: 48px 24px; }
+  #how { padding: 72px 24px 0; }
+  .how-cards { grid-template-columns: 1fr; }
+  #vision { padding: 72px 24px; }
+  .vision-grid { grid-template-columns: 1fr; }
+  #creator { grid-template-columns: 1fr; gap: 40px; padding: 72px 24px; }
+  footer { flex-direction: column; gap: 20px; padding: 32px 24px; }
+  .footer-meta { text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <a class="logo" href="#hero">
+    <span class="logo-lambda">λ</span>&nbsp;AURA
+  </a>
+  <nav>
+    <a href="#illustration">Ürün</a>
+    <a href="#how">Nasıl Çalışır</a>
+    <a href="#vision">Vizyon</a>
+    <a href="#creator">Hakkında</a>
+  </nav>
+  <div class="header-badge">Prototype MK-1</div>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section id="hero">
+  <div class="hero-bg-lambda" aria-hidden="true">λ</div>
+
+  <div class="hero-body">
+    <p class="hero-eyebrow">Ultrasonik Parametrik Ses Sistemi</p>
+    <h1>AURA<br><span class="light">Sound System</span></h1>
+    <p class="hero-desc">
+      Ses yalnızca <strong>hedeflenen kişiye</strong> ulaşır.<br>
+      40kHz ultrasonik dizi, sesi görünmez bir kanala dönüştürür.
+    </p>
+    <div class="hero-cta">
+      <a href="#illustration" class="btn btn-white">Ürünü İncele</a>
+      <a href="#how" class="btn btn-text">Nasıl Çalışır →</a>
+    </div>
+  </div>
+
+  <div class="hero-foot">
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">40<sub>kHz</sub></div>
+        <div class="stat-lbl">Taşıyıcı Frekans</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">14<sub>×</sub></div>
+        <div class="stat-lbl">Ultrasonik Transdüser</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">16<sub>kHz</sub></div>
+        <div class="stat-lbl">PCM Örnekleme</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      Aşağı Kaydır
+      <div class="scroll-hint-line"></div>
+    </div>
+  </div>
+</section>
+
+<div class="hr"></div>
+
+<!-- ═══════════════════ PRODUCT ILLUSTRATION ═══════════════════ -->
+<div id="illustration">
+  <!-- Tamamen elle çizilmiş — video karelerinden referans alındı -->
+  <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="barTop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#404040"/>
+        <stop offset="40%" stop-color="#2c2c2c"/>
+        <stop offset="100%" stop-color="#181818"/>
+      </linearGradient>
+      <linearGradient id="tdFace" x1="0.3" y1="0.2" x2="0.8" y2="0.9">
+        <stop offset="0%" stop-color="#585858"/>
+        <stop offset="60%" stop-color="#2a2a2a"/>
+        <stop offset="100%" stop-color="#0d0d0d"/>
+      </linearGradient>
+      <linearGradient id="tdRing" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#5a5a5a"/>
+        <stop offset="100%" stop-color="#1e1e1e"/>
+      </linearGradient>
+      <linearGradient id="boxFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#424242"/>
+        <stop offset="100%" stop-color="#1a1a1a"/>
+      </linearGradient>
+      <linearGradient id="pcbGreen" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a3a1a"/>
+        <stop offset="100%" stop-color="#0a1a0a"/>
+      </linearGradient>
+      <linearGradient id="pcbRed" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#3a0d0d"/>
+        <stop offset="100%" stop-color="#1a0505"/>
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- BAR GÖLGE -->
+    <rect x="32" y="128" width="936" height="88" rx="10" fill="#000" opacity=".6" transform="translate(0,12)"/>
+
+    <!-- BAR ALTI (derinlik) -->
+    <rect x="32" y="202" width="936" height="10" rx="4" fill="#111"/>
+
+    <!-- BAR ARKA (kenar dolgu) -->
+    <rect x="34" y="118" width="932" height="88" rx="9" fill="#1c1c1c"/>
+
+    <!-- BAR GÖVDE -->
+    <rect x="32" y="114" width="936" height="88" rx="9" fill="url(#barTop)" stroke="#484848" stroke-width="1"/>
+
+    <!-- BAR ÜST HİGHLIGHT ŞERİDİ -->
+    <rect x="36" y="115" width="928" height="2.5" rx="1.2" fill="#606060" opacity=".5"/>
+
+    <!-- ALT ETİKET ÇEKMECESİ -->
+    <rect x="36" y="186" width="928" height="12" rx="2" fill="rgba(0,0,0,0.5)"/>
+    <text x="500" y="196" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5"
+      fill="#2a2a2a" letter-spacing="3.5">AURA PARAMETRIC SPEAKER ARRAY — MK-1 — MERT EMİR GÜLTEKİN — 2026</text>
+
+    <!-- SOL UÇ KAPAK -->
+    <rect x="32" y="114" width="16" height="88" rx="7" fill="#303030" stroke="#505050" stroke-width=".8"/>
+    <!-- SAĞ UÇ KAPAK -->
+    <rect x="952" y="114" width="16" height="88" rx="7" fill="#303030" stroke="#505050" stroke-width=".8"/>
+
+    <!-- ═══ TRANSDÜSER MACRO (1 tanesi için tüm katmanlar) ═══
+         Konumlar: sol grup cx = 88,154,220,286,352,418,452
+                   sağ grup cx = 548,614,680,746,812,878,912           -->
+
+    <!-- SOL GRUP — büyük transdüserler (TD 1-6, cx artışı 66) -->
+    <!-- TD L1 -->
+    <circle cx="88"  cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="88"  cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="88"  cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="88"  cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="88"  cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="82"  cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L2 -->
+    <circle cx="154" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="154" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="154" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="154" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="154" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="148" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L3 -->
+    <circle cx="220" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="220" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="220" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="220" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="220" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="214" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L4 -->
+    <circle cx="286" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="286" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="286" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="286" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="286" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="280" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L5 -->
+    <circle cx="352" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="352" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="352" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="352" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="352" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="346" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L6 -->
+    <circle cx="418" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="418" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="418" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="418" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="418" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="412" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD L7 (küçük, kutuya yakın) -->
+    <circle cx="452" cy="158" r="19" fill="#0c0c0c" stroke="#2a2a2a" stroke-width=".6"/>
+    <circle cx="452" cy="158" r="15" fill="url(#tdRing)" stroke="#383838" stroke-width=".5"/>
+    <circle cx="452" cy="158" r="10" fill="url(#tdFace)"/>
+    <circle cx="452" cy="158" r="6"  fill="#141414"/>
+    <circle cx="452" cy="158" r="2.5" fill="#0a0a0a"/>
+
+    <!-- SAĞ GRUP -->
+    <!-- TD R1 (küçük, kutuya yakın) -->
+    <circle cx="548" cy="158" r="19" fill="#0c0c0c" stroke="#2a2a2a" stroke-width=".6"/>
+    <circle cx="548" cy="158" r="15" fill="url(#tdRing)" stroke="#383838" stroke-width=".5"/>
+    <circle cx="548" cy="158" r="10" fill="url(#tdFace)"/>
+    <circle cx="548" cy="158" r="6"  fill="#141414"/>
+    <circle cx="548" cy="158" r="2.5" fill="#0a0a0a"/>
+    <!-- TD R2 -->
+    <circle cx="582" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="582" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="582" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="582" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="582" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="576" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD R3 -->
+    <circle cx="648" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="648" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="648" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="648" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="648" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="642" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD R4 -->
+    <circle cx="714" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="714" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="714" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="714" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="714" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="708" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD R5 -->
+    <circle cx="780" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="780" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="780" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="780" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="780" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="774" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD R6 -->
+    <circle cx="846" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="846" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="846" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="846" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="846" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="840" cy="152" r="2"   fill="#888" opacity=".25"/>
+    <!-- TD R7 -->
+    <circle cx="912" cy="158" r="28" fill="#0c0c0c" stroke="#333" stroke-width=".8"/>
+    <circle cx="912" cy="158" r="23" fill="url(#tdRing)" stroke="#444" stroke-width=".7"/>
+    <circle cx="912" cy="158" r="17" fill="url(#tdFace)"/>
+    <circle cx="912" cy="158" r="10" fill="#141414" stroke="#2e2e2e" stroke-width=".5"/>
+    <circle cx="912" cy="158" r="4.5" fill="#0a0a0a"/>
+    <circle cx="906" cy="152" r="2"   fill="#888" opacity=".25"/>
+
+    <!-- ═══ MENTEŞE BAĞLANTI BRAKETLERI ═══ -->
+    <rect x="461" y="132" width="10" height="52" rx="3" fill="#252525" stroke="#3a3a3a" stroke-width=".6"/>
+    <rect x="529" y="132" width="10" height="52" rx="3" fill="#252525" stroke="#3a3a3a" stroke-width=".6"/>
+    <circle cx="466" cy="158" r="4"  fill="#1a1a1a" stroke="#333" stroke-width=".5"/>
+    <circle cx="534" cy="158" r="4"  fill="#1a1a1a" stroke="#333" stroke-width=".5"/>
+
+    <!-- ═══ ANA KART KUTUSU ═══ -->
+    <!-- Gölge -->
+    <rect x="464" y="86" width="72" height="88" rx="5" fill="#000" opacity=".5" transform="translate(2,3)"/>
+    <!-- Kutu gövde -->
+    <rect x="464" y="84" width="72" height="88" rx="5" fill="url(#boxFace)" stroke="#525252" stroke-width="1"/>
+    <!-- Kutu üst highlight -->
+    <rect x="467" y="85" width="66" height="2" rx="1" fill="#666" opacity=".45"/>
+    <!-- Kutu iç çerçeve -->
+    <rect x="468" y="88" width="64" height="80" rx="3" fill="#111" stroke="#222" stroke-width=".5"/>
+
+    <!-- Yeşil PCB (Geliştirici kart / TC4427 devre) -->
+    <rect x="472" y="92" width="38" height="28" rx="2" fill="url(#pcbGreen)" stroke="#1e3d1e" stroke-width=".6"/>
+    <!-- PCB trace detayları -->
+    <line x1="475" y1="97"  x2="506" y2="97"  stroke="#1e4a1e" stroke-width=".5"/>
+    <line x1="475" y1="101" x2="502" y2="101" stroke="#1e4a1e" stroke-width=".5"/>
+    <line x1="475" y1="105" x2="504" y2="105" stroke="#1e4a1e" stroke-width=".5"/>
+    <line x1="475" y1="109" x2="500" y2="109" stroke="#1e4a1e" stroke-width=".5"/>
+    <!-- IC çipler -->
+    <rect x="476" y="93"  width="8"  height="6"  rx="1" fill="#0a0a0a" stroke="#2a2a2a" stroke-width=".3"/>
+    <rect x="488" y="93"  width="6"  height="6"  rx="1" fill="#0a0a0a" stroke="#2a2a2a" stroke-width=".3"/>
+    <rect x="496" y="93"  width="10" height="6"  rx="1" fill="#0a0a0a" stroke="#2a2a2a" stroke-width=".3"/>
+    <!-- TC4427 label -->
+    <text x="491" y="113" text-anchor="middle" font-family="'DM Mono',monospace" font-size="4" fill="#2a4a2a" letter-spacing=".5">TC4427</text>
+
+    <!-- Kırmızı Deneyap Kart -->
+    <rect x="472" y="124" width="36" height="24" rx="2" fill="url(#pcbRed)" stroke="#4a1a1a" stroke-width=".6"/>
+    <!-- Deneyap PCB trace -->
+    <line x1="475" y1="129" x2="504" y2="129" stroke="#3a0a0a" stroke-width=".5"/>
+    <line x1="475" y1="133" x2="500" y2="133" stroke="#3a0a0a" stroke-width=".5"/>
+    <!-- Deneyap IC'ler -->
+    <rect x="476" y="125" width="9"  height="6"  rx="1" fill="#0a0a0a" stroke="#2a0a0a" stroke-width=".3"/>
+    <rect x="488" y="125" width="7"  height="6"  stroke="#2a0a0a" fill="#0a0a0a" stroke-width=".3"/>
+    <rect x="498" y="125" width="8"  height="6"  stroke="#2a0a0a" fill="#0a0a0a" stroke-width=".3"/>
+    <!-- Deneyap label -->
+    <text x="490" y="145" text-anchor="middle" font-family="'DM Mono',monospace" font-size="3.8" fill="#4a1a1a" letter-spacing=".5">DENEYAP 1A</text>
+
+    <!-- USB micro portu -->
+    <rect x="465" y="148" width="7" height="10" rx="1" fill="#222" stroke="#3a3a3a" stroke-width=".5"/>
+    <rect x="466" y="149" width="5" height="8"  rx=".5" fill="#111"/>
+
+    <!-- Kablo çıkışları -->
+    <line x1="498" y1="172" x2="498" y2="204" stroke="#bb2222" stroke-width="1.4" stroke-linecap="round"/>
+    <line x1="501" y1="172" x2="501" y2="204" stroke="#222222" stroke-width="1.4" stroke-linecap="round"/>
+    <line x1="504" y1="172" x2="504" y2="204" stroke="#2222bb" stroke-width="1.4" stroke-linecap="round"/>
+
+    <!-- ═══ ANNOTASYON ═══ -->
+    <!-- Sol grup -->
+    <line x1="220" y1="114" x2="220" y2="74" stroke="#2a2a2a" stroke-width=".7" stroke-dasharray="3 3"/>
+    <line x1="88"  y1="74"  x2="420" y2="74" stroke="#2a2a2a" stroke-width=".7"/>
+    <circle cx="88"  cy="74" r="2.5" fill="#2a2a2a"/>
+    <circle cx="420" cy="74" r="2.5" fill="#2a2a2a"/>
+    <text x="220" y="65" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8.5" fill="#3a3a3a" letter-spacing="1.5">7× UTX TRANSDÜSER — SOL</text>
+
+    <!-- Sağ grup -->
+    <line x1="748" y1="114" x2="748" y2="74" stroke="#2a2a2a" stroke-width=".7" stroke-dasharray="3 3"/>
+    <line x1="548" y1="74"  x2="912" y2="74" stroke="#2a2a2a" stroke-width=".7"/>
+    <circle cx="548" cy="74" r="2.5" fill="#2a2a2a"/>
+    <circle cx="912" cy="74" r="2.5" fill="#2a2a2a"/>
+    <text x="748" y="65" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8.5" fill="#3a3a3a" letter-spacing="1.5">7× UTX TRANSDÜSER — SAĞ</text>
+
+    <!-- Merkez kutu -->
+    <line x1="500" y1="84"  x2="500" y2="50" stroke="#2a2a2a" stroke-width=".7" stroke-dasharray="3 3"/>
+    <circle cx="500" cy="50" r="2.5" fill="#2a2a2a"/>
+    <text x="500" y="42" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8.5" fill="#3a3a3a" letter-spacing="1.5">DENEYAP KART 1A + TC4427</text>
+
+    <!-- Boyut çizgisi -->
+    <line x1="32"  y1="234" x2="968" y2="234" stroke="#1e1e1e" stroke-width=".6"/>
+    <line x1="32"  y1="229" x2="32"  y2="239" stroke="#1e1e1e" stroke-width=".6"/>
+    <line x1="968" y1="229" x2="968" y2="239" stroke="#1e1e1e" stroke-width=".6"/>
+    <text x="500" y="250" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8" fill="#2a2a2a" letter-spacing="2">≈ 420 mm</text>
+
+    <!-- Ultrasonik ses dalgası animasyonu (üst) -->
+    <ellipse cx="500" cy="84" rx="60" ry="10" fill="none" stroke="#222" stroke-width=".6">
+      <animate attributeName="ry"   values="10;28;10" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="rx"   values="60;90;60" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".4;0;.4" dur="2.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="500" cy="84" rx="100" ry="18" fill="none" stroke="#1a1a1a" stroke-width=".5">
+      <animate attributeName="ry"   values="18;46;18" dur="2.5s" begin=".5s" repeatCount="indefinite"/>
+      <animate attributeName="rx"   values="100;150;100" dur="2.5s" begin=".5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".25;0;.25" dur="2.5s" begin=".5s" repeatCount="indefinite"/>
+    </ellipse>
+  </svg>
+</div>
+
+<!-- ═══════════════════ PRODUCT DETAIL ═══════════════════ -->
+<div class="product-grid">
+  <div class="product-col reveal">
+    <p class="col-label">01 — Ürün</p>
+    <h2 class="col-headline">Tamamen<br>yönlü ses.</h2>
+    <p class="col-body">
+      AURA, 40kHz ultrasonik dalgaları AM modülasyon tekniğiyle ses bilgisi taşıyan bir taşıyıcıya dönüştürür. Bu dalga havada yayılırken kendi kendine işitilebilir ses frekansları oluşturur — yalnızca yayının odaklandığı noktada.
+    </p>
+    <p class="col-body" style="margin-top:14px; color: var(--g5);">Yanındaki kişi hiçbir şey duymaz.</p>
+  </div>
+  <div class="product-col reveal d1">
+    <p class="col-label">Teknik Özellikler</p>
+    <div class="spec-row"><span class="spec-key">Taşıyıcı Frekans</span><span class="spec-val">40.000 Hz</span></div>
+    <div class="spec-row"><span class="spec-key">Transdüser</span><span class="spec-val">14× UTX — 1×7 Dizi</span></div>
+    <div class="spec-row"><span class="spec-key">İşlemci</span><span class="spec-val">ESP32 / Deneyap Kart 1A</span></div>
+    <div class="spec-row"><span class="spec-key">Sürücü</span><span class="spec-val">TC4427 MOSFET Driver</span></div>
+    <div class="spec-row"><span class="spec-key">Örnekleme Hızı</span><span class="spec-val">16.000 Hz PCM</span></div>
+    <div class="spec-row"><span class="spec-key">PWM Çözünürlüğü</span><span class="spec-val">8-bit (0–255)</span></div>
+    <div class="spec-row"><span class="spec-key">AM Formülü</span><span class="spec-val">duty = 127 + sample</span></div>
+    <div class="spec-row"><span class="spec-key">Çıkış Pini</span><span class="spec-val">GPIO1 (TX)</span></div>
+    <div class="spec-row"><span class="spec-key">Gövde</span><span class="spec-val">FDM 3D Baskı — PLA</span></div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+<div id="how">
+  <p class="section-label reveal">02 — Çalışma Prensibi</p>
+  <h2 class="section-title reveal">Ses,<br><em>nasıl gizlenir?</em></h2>
+  <div class="how-cards">
+    <div class="how-card reveal">
+      <p class="card-num">01</p>
+      <svg class="card-icon" viewBox="0 0 38 38">
+        <circle cx="19" cy="19" r="13"/>
+        <circle cx="19" cy="19" r="5"/>
+        <line x1="19" y1="4"  x2="19" y2="9"/>
+        <line x1="19" y1="29" x2="19" y2="34"/>
+        <line x1="4"  y1="19" x2="9"  y2="19"/>
+        <line x1="29" y1="19" x2="34" y2="19"/>
+      </svg>
+      <p class="card-title">40kHz Taşıyıcı Dalga</p>
+      <p class="card-body">ESP32, 40.000 Hz'de PWM taşıyıcı oluşturur. İnsan kulağı bu frekansı duyamaz. Ses bilgisi AM modülasyonla bu dalgaya işlenir; duty = 127 + audioSample formülüyle tam 8-bit aralık kullanılır.</p>
+    </div>
+    <div class="how-card reveal d1">
+      <p class="card-num">02</p>
+      <svg class="card-icon" viewBox="0 0 38 38">
+        <rect x="4" y="12" width="30" height="18" rx="2"/>
+        <line x1="11" y1="12" x2="11" y2="6"/>
+        <line x1="19" y1="12" x2="19" y2="6"/>
+        <line x1="27" y1="12" x2="27" y2="6"/>
+        <line x1="11" y1="30" x2="11" y2="36"/>
+        <line x1="19" y1="30" x2="19" y2="36"/>
+        <line x1="27" y1="30" x2="27" y2="36"/>
+      </svg>
+      <p class="card-title">14× Transdüser Dizisi</p>
+      <p class="card-body">TC4427 MOSFET sürücü, bu sinyali 14 adet ultrasonik transdüsere iletir. 1×7 düz dizi yapısı sesi dar bir kolon halinde ileriye odaklar. Yan ve arka yönlere ses sızmaz.</p>
+    </div>
+    <div class="how-card reveal d2">
+      <p class="card-num">03</p>
+      <svg class="card-icon" viewBox="0 0 38 38">
+        <path d="M5 19 Q9 5 19 5 Q29 5 33 19 Q29 33 19 33 Q9 33 5 19Z"/>
+        <circle cx="19" cy="19" r="4"/>
+      </svg>
+      <p class="card-title">Havada Ses Oluşumu</p>
+      <p class="card-body">Ultrasonik dalga havada yayılırken doğrusal olmayan akustik (nonlinear acoustics) etkisiyle kendi kendini deforme eder. Yalnızca odak noktasında işitilebilir ses meydana gelir.</p>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════════ VISION ═══════════════════ -->
+<div id="vision">
+  <p class="section-label reveal">03 — Vizyon</p>
+  <h2 class="section-title reveal">Sesin<br><em>gittiği yer.</em></h2>
+  <p class="vision-lead reveal">Yönlü ses, bugüne kadar çözülemeyen bir problemi ortadan kaldırır: gürültü kirliliği olmadan, yalnızca hedeflenen kişiye özel sesli iletişim.</p>
+  <div class="vision-grid">
+    <div class="vision-card reveal">
+      <svg class="vision-icon" viewBox="0 0 34 34">
+        <rect x="3" y="5" width="28" height="22" rx="2"/>
+        <line x1="3"  y1="14" x2="31" y2="14"/>
+        <line x1="11" y1="5"  x2="11" y2="27"/>
+        <circle cx="7"  cy="10" r="1.5" fill="currentColor" stroke="none" style="fill:var(--g4)"/>
+        <line x1="10" y1="29" x2="10" y2="32"/>
+        <line x1="24" y1="29" x2="24" y2="32"/>
+        <line x1="7"  y1="32" x2="27" y2="32"/>
+      </svg>
+      <div>
+        <p class="vision-title">Self Servis Kasalar</p>
+        <p class="vision-body">Ödeme yönergeleri yalnızca o kasayı kullanan kişiye ulaşır. Yanındaki kasanın sesi karışmaz.</p>
+      </div>
+    </div>
+    <div class="vision-card reveal d1">
+      <svg class="vision-icon" viewBox="0 0 34 34">
+        <rect x="7" y="3" width="20" height="28" rx="2"/>
+        <rect x="10" y="7" width="14" height="10" rx="1"/>
+        <rect x="11" y="21" width="4"  height="4"  rx="1"/>
+        <rect x="17" y="21" width="4"  height="4"  rx="1"/>
+        <line x1="17" y1="17" x2="17" y2="21"/>
+      </svg>
+      <div>
+        <p class="vision-title">Bankmatikler</p>
+        <p class="vision-body">ATM sesli yönlendirmeleri yalnızca ekrana bakan kişiye iletilir. Arkadaki kuyruktaki kişi duymaz.</p>
+      </div>
+    </div>
+    <div class="vision-card reveal d2">
+      <svg class="vision-icon" viewBox="0 0 34 34">
+        <path d="M5 27 L5 13 L17 4 L29 13 L29 27 Z"/>
+        <rect x="12" y="17" width="10" height="10"/>
+        <line x1="17" y1="11" x2="17" y2="15"/>
+      </svg>
+      <div>
+        <p class="vision-title">Müzeler</p>
+        <p class="vision-body">Her eserin önünde duran ziyaretçi yalnızca o eserin sesli açıklamasını alır. Komşu eserlerin sesi karışmaz.</p>
+      </div>
+    </div>
+    <div class="vision-card reveal d3">
+      <svg class="vision-icon" viewBox="0 0 34 34">
+        <rect x="3" y="6" width="28" height="22" rx="2"/>
+        <line x1="3"  y1="15" x2="31" y2="15"/>
+        <line x1="3"  y1="22" x2="31" y2="22"/>
+        <line x1="10" y1="6"  x2="10" y2="28"/>
+        <line x1="20" y1="6"  x2="20" y2="28"/>
+      </svg>
+      <div>
+        <p class="vision-title">Sınıflar ve Okullar</p>
+        <p class="vision-body">Öğretmenin sesi komşu sınıfları rahatsız etmez. Her sınıf, duvar kalınlığından bağımsız olarak kendi akustik ortamını korur.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════════ CREATOR ═══════════════════ -->
+<div id="creator">
+  <div class="reveal">
+    <h2 class="creator-name">Mert Emir<br>Gültekin</h2>
+    <p class="creator-role">Tasarımcı &amp; Yazılım Geliştirici</p>
+    <p class="creator-bio">AURA'nın devre tasarımını, 3D baskı gövdesini ve ESP32 firmware'ini sıfırdan geliştiren kişi. Ultrasonik akustik, gömülü sistemler ve donanım prototipi alanlarında çalışıyor.</p>
+  </div>
+  <div class="reveal d1">
+    <div class="data-row"><span class="data-key">Proje</span><span class="data-val">AURA Parametrik Hoparlör</span></div>
+    <div class="data-row"><span class="data-key">Versiyon</span><span class="data-val">Prototype MK-1</span></div>
+    <div class="data-row"><span class="data-key">Donanım</span><span class="data-val">Deneyap Kart 1A / ESP32</span></div>
+    <div class="data-row"><span class="data-key">Sürücü</span><span class="data-val">TC4427 Dual MOSFET</span></div>
+    <div class="data-row"><span class="data-key">Taşıyıcı</span><span class="data-val">40kHz Ultrasonik PWM</span></div>
+    <div class="data-row"><span class="data-key">Üretim</span><span class="data-val">FDM 3D Baskı / PLA</span></div>
+    <div class="data-row"><span class="data-key">Yıl</span><span class="data-val">2026 — Türkiye</span></div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <a class="footer-logo" href="#hero">
+    <span class="logo-lambda">λ</span>&nbsp;AURA
+  </a>
+  <div class="footer-meta">
+    Mert Emir Gültekin · Tasarımcı &amp; Geliştirici<br>
+    ESP32 · TC4427 · 14× UTX · 40kHz · Deneyap Kart 1A<br>
+    Prototype MK-1 · 2026 · Türkiye
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Scroll reveal
+  var items = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      }
+    });
+  }, { threshold: 0.08 });
+  items.forEach(function (el) { observer.observe(el); });
+
+  // Header arka plan
+  var header = document.querySelector('header');
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 20) {
+      header.style.borderBottomColor = '#1e1e1e';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
